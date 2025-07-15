@@ -27,7 +27,27 @@ export default function Home() {
               Scan Code
             </Text>
           </Pressable>
-
+        </Link>
+        <Link href={"/(auth)/signin"} asChild>
+            <Pressable>
+              <Text style={styles.buttonStyle} >
+                Sign In Page
+              </Text>
+            </Pressable>
+        </Link>
+        <Link href={"/(auth)/signup"} asChild>
+            <Pressable>
+              <Text style={styles.buttonStyle} >
+                Sign Out Page
+              </Text>
+            </Pressable>
+        </Link>
+        <Link href={"/(auth)/forgotpassword"} asChild>
+            <Pressable>
+              <Text style={styles.buttonStyle} >
+                Forgot Password Page
+              </Text>
+            </Pressable>
         </Link>
       </View>
     </SafeAreaView>
