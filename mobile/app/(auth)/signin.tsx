@@ -16,7 +16,7 @@ import {
     Image
 } from "react-native"
 import { Ionicons } from '@expo/vector-icons'
-import { Link, router } from "expo-router"
+import { Link, router } from 'expo-router'
 import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
 import { auth } from '../../config/firebase'
 import { FirebaseError } from 'firebase/app'
