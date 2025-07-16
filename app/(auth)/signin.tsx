@@ -16,7 +16,10 @@ import {
     Image
 } from "react-native"
 import { Ionicons } from '@expo/vector-icons'
-import { Link } from "expo-router"
+import { Link, router } from "expo-router"
+import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
+import { auth } from '../../config/firebase'
+import { FirebaseError } from 'firebase/app'
 
 export default function SignIn () {
 
@@ -24,6 +27,7 @@ export default function SignIn () {
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [rememberMe, setRememberMe] = useState(false)
 
     const handleSignIn = async () => {
         if (!email || !password) {
@@ -33,11 +37,72 @@ export default function SignIn () {
         setLoading(true)
 
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            const userCredential = await signInWithEmailAndPassword(auth, email, password)
+            const user = userCredential.user
 
-            console.log("Sign in successful")
+            if(!user.emailVerified) {
+                Alert.alert("Email Not Verified", "Please verify your email before signing in. Would you like us to send another email?",
+                    [{
+                        text: "Cancel",
+                        style: "cancel"
+                    },
+                    {
+                        text: "Resend",
+                        onPress: async () => {
+                            try {
+                                await sendEmailVerification(user)
+                                Alert.alert("Success", "Email verification sent")
+                            } catch (error) {
+                                Alert.alert("Error", "Failed to send verification email. Please try again.")
+                            }
+                        }
+                    }
+                ]
+                )
+                return
+            }
+
+            console.log("Sign in successful", user.uid)
+
+            Alert.alert("Success!", "Welcome to Surgicom Nettworx", 
+                [{
+                    text: "OK", onPress:() => router.push("/")
+                    
+                }]
+            )
         } catch (error) {
-            Alert.alert("Sign in Failed", "Invalid email or password. Please try again.")
+            console.log("Sign in error.", error)
+
+            let errorMessage = "Invalid email or password. Please try again."
+
+           if(error instanceof FirebaseError) {
+            
+            switch (error.code) {
+                 case 'auth/invalid-email':
+                    errorMessage = "Please enter a valid email address."
+                    break
+                case 'auth/user-disabled':
+                    errorMessage = "This account has been disabled. Please contact support."
+                    break
+                case 'auth/user-not-found':
+                    errorMessage = "No account found with this email. Please sign up first."
+                    break
+                case 'auth/wrong-password':
+                    errorMessage = "Incorrect password. Please try again."
+                    break
+                case 'auth/too-many-requests':
+                    errorMessage = "Too many failed attempts. Please try again later."
+                    break
+                case 'auth/network-request-failed':
+                    errorMessage = "Network error. Please check your connection and try again."
+                    break
+                case 'auth/invalid-credential':
+                    errorMessage = "Invalid email or password. Please check your credentials."
+                    break
+            }
+        }
+
+            Alert.alert("Sign in Failed", errorMessage)
         } finally {
             setLoading(false)
         }
@@ -115,7 +180,7 @@ export default function SignIn () {
                                 <Ionicons name="checkbox-outline" size={20} color="#2563eb" />
                                 <Text style={styles.rememberText}>Remember me</Text>
                             </TouchableOpacity>
-                            <Link href="/(auth)/forgot-password" asChild>
+                            <Link href="/(auth)/forgotpassword" asChild>
                                 <TouchableOpacity>
                                     <Text style={styles.forgotText}>Forgot password?</Text>
                                 </TouchableOpacity>
@@ -166,7 +231,7 @@ export default function SignIn () {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#f8fafc",
+        backgroundColor: "#fffefe",
     },
     keyboardView: {
         flex: 1,

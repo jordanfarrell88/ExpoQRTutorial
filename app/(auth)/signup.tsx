@@ -17,7 +17,11 @@ import {
 } from "react-native"
 import { Picker } from "@react-native-picker/picker"
 import { Ionicons } from "@expo/vector-icons"
-import { Link } from "expo-router"
+import { Link, router } from "expo-router"
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth"
+import { doc, setDoc } from "firebase/firestore"
+import { auth, db } from "../../config/firebase"
+import { FirebaseError } from "firebase/app"
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -82,15 +86,58 @@ export default function SignUp() {
     setLoading(true)
 
     try {
-      // Firebase Auth sign up would go here
-      // Example: await createUserWithEmailAndPassword(auth, formData.email, formData.password)
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      )
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const user = userCredential.user
 
-      Alert.alert("Success", "Account created successfully! Please check your email for verification.")
+      await sendEmailVerification(user)
+
+      await setDoc(doc(db, 'users', user.uid), {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        specialty: formData.specialty,
+        institution: formData.institution,
+        createdAt: new Date().toISOString(),
+        emailVerified: false,
+        profileComplete: false
+      })
+
+      Alert.alert("Success", "Account created successfully! Please check your email for verification.",
+        [{
+          text: "OK", onPress: () => router.push("/(auth)/signin")
+        }]
+      )
     } catch (error) {
-      Alert.alert("Sign Up Failed", "An error occurred while creating your account. Please try again.")
+      console.error('Sign up error', error)
+
+      let errorMessage = "An error occurred while creating your account. Please try again."
+
+      if (error instanceof FirebaseError) {
+        
+        switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = "This email is already registered. Please use a different email or try again"
+          break;
+        case 'auth/invalid-email':
+          errorMessage = "Please enter a valid email address."
+          break
+        case 'auth/weak-password':
+          errorMessage = "Password is too weak. Please choose a stronger password"
+          break
+        case 'auth/network-request-failed':
+          errorMessage = "Network error. Please check your connection."
+          break
+        
+      }
+    }
+
+      Alert.alert("Sign Up Failed", errorMessage)
+
     } finally {
       setLoading(false)
     }
@@ -285,7 +332,7 @@ export default function SignUp() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#fffefe",
   },
   keyboardView: {
     flex: 1,
