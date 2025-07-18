@@ -82,7 +82,7 @@ export default function Home() {
         <Link href={"/(auth)/signup"} asChild>
             <Pressable>
               <Text style={styles.buttonStyle} >
-                Sign Out Page
+                Sign Up Page
               </Text>
             </Pressable>
         </Link>
@@ -90,6 +90,13 @@ export default function Home() {
             <Pressable>
               <Text style={styles.buttonStyle} >
                 Forgot Password Page
+              </Text>
+            </Pressable>
+        </Link>
+        <Link href={"deliveries/product-scanned"} asChild>
+            <Pressable>
+              <Text style={styles.buttonStyle} >
+                Product Scanned Page
               </Text>
             </Pressable>
         </Link>

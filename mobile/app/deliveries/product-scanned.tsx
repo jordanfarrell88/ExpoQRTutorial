@@ -1,10 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
+import React from "react";
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
+
 export default function ProductScan() {
+
+  const [quantity, setQuantity] = React.useState(0)
+  const [isDisabled, setIsDisabled] = React.useState(false)
+  
+
+  if(quantity == 0 && !isDisabled) {
+    setIsDisabled(true)
+  } else if(quantity > 0 && isDisabled){
+    setIsDisabled(false)
+  }
+    
 
     return (
         <SafeAreaView style={styles.container}>
@@ -27,7 +40,7 @@ export default function ProductScan() {
                             <Text style={styles.productName}>Surgical Scalpel Set</Text>
                             <Text style={styles.productCategory}>Surgical Instruments</Text>
                             <Text style={styles.productSupplier}>by MedTech Solutions</Text>
-                            <Text style={styles.productPrice}>$45.99 per unit</Text>
+                            <Text style={styles.productPrice}>R45 per unit</Text>
                                  
                         </View>
                     </View>
@@ -36,26 +49,7 @@ export default function ProductScan() {
             Premium stainless steel surgical scalpels with disposable blades for precision medical procedures
                     </Text>
 
-                    {/* Specifications */}
-                    <View style={styles.specificationsContainer}>
-                        <Text style={styles.specificationsTitle}>Specifications:</Text>
-                        <View style={styles.specificationItem}>
-                        <Ionicons name="checkmark-circle" size={16} color="#10b981" />
-                        <Text style={styles.specificationText}>Material: Stainless Steel</Text>
-                        </View>
-                        <View style={styles.specificationItem}>
-                        <Ionicons name="checkmark-circle" size={16} color="#10b981" />
-                        <Text style={styles.specificationText}>Blade Size: #10, #11, #15</Text>
-                        </View>
-                        <View style={styles.specificationItem}>
-                        <Ionicons name="checkmark-circle" size={16} color="#10b981" />
-                        <Text style={styles.specificationText}>Sterile Packaging</Text>
-                        </View>
-                        <View style={styles.specificationItem}>
-                        <Ionicons name="checkmark-circle" size={16} color="#10b981" />
-                        <Text style={styles.specificationText}>Single Use Blades</Text>
-                        </View>
-                    </View>
+                    
                     </View>
 
                     {/* Quantity Selection */}
@@ -64,39 +58,32 @@ export default function ProductScan() {
                     <Text style={styles.sectionSubtitle}>How many items are you receiving?</Text>
 
                     <View style={styles.quantityContainer}>
-                        <TouchableOpacity style={styles.quantityButton}>
+                        <TouchableOpacity 
+                          style={styles.quantityButton} 
+                            onPress={() => setQuantity(Math.max(0, quantity - 1))} 
+                            disabled={isDisabled}
+                            >
                         <Ionicons name="remove" size={24} color="#374151" />
                         </TouchableOpacity>
 
-                        <TextInput style={styles.quantityInput} value="1" keyboardType="numeric" textAlign="center" maxLength={4} />
+                        <TextInput style={styles.quantityInput} value={quantity.toString()} keyboardType="numeric" textAlign="center" maxLength={4} />
 
-                        <TouchableOpacity style={styles.quantityButton}>
+                        <TouchableOpacity style={styles.quantityButton} onPress={() =>setQuantity(quantity + 1)}>
                         <Ionicons name="add" size={24} color="#374151" />
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.totalText}>Total Value: $45.99</Text>
+                    <Text style={styles.totalText}>Total Value: R45</Text>
                     </View>
 
-                    {/* Notes Section */}
-                    <View style={styles.notesCard}>
-                    <Text style={styles.sectionTitle}>Delivery Notes</Text>
-                    <Text style={styles.sectionSubtitle}>Add any additional information (optional)</Text>
+                    
 
-                    <TextInput
-                        style={styles.notesInput}
-                        placeholder="e.g., Condition of items, special handling notes..."
-                        placeholderTextColor="#9ca3af"
-                        multiline
-                        numberOfLines={4}
-                        textAlignVertical="top"
-                    />
-                    </View>
-                
-                <TouchableOpacity style={styles.confirmButton}>
-                    <Ionicons name="checkmark-circle" size={54} color="#FFFFFF"/>
-                    <Text style={styles.confirmButtonText}>Confirm Delivery</Text>
-                </TouchableOpacity>
+                <View style={{ justifyContent: "center", alignItems: "center"}}>
+                  <TouchableOpacity style={styles.confirmButton}>
+                      <Ionicons name="checkmark-circle" size={25} color="#FFFFFF"/>
+                      <Text style={styles.confirmButtonText}>Confirm Delivery</Text>
+                  </TouchableOpacity>
+                </View>
 
             </ScrollView>
         </SafeAreaView>
@@ -213,7 +200,7 @@ const styles = StyleSheet.create({
   quantityCard: {
     backgroundColor: "#ffffff",
     marginHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 70,
     borderRadius: 12,
     padding: 20,
     shadowColor: "#000",
@@ -240,7 +227,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
+    marginBottom: 30,
   },
   quantityButton: {
     width: 48,
@@ -295,9 +282,9 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     backgroundColor: "#2563eb",
-    marginHorizontal: 16,
+    marginHorizontal: 8,
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: 8,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -309,12 +296,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    height:90,
+    width: 250
   },
   confirmButtonText: {
     color: "#ffffff",
     fontSize: 18,
     fontWeight: "600",
     marginLeft: 8,
+    
   },
   bottomPadding: {
     height: 32,
