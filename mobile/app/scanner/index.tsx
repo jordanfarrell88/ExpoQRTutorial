@@ -1,5 +1,5 @@
 import { CameraView } from "expo-camera";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { AppState, Linking, Platform, SafeAreaView, StyleSheet } from "react-native";
 import { Overlay } from "./Overlay";
 import { StatusBar } from "expo-status-bar";
@@ -42,7 +42,10 @@ export default function Home() {
           if(data && !qrLock.current){
             qrLock.current = true
             setTimeout(async() => {
-            await Linking.openURL(data)
+            router.push({
+              pathname: "/deliveries/product-scanned",
+              params: {line_code: data},
+            })
           }, 500)
           }
           

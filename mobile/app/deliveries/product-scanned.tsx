@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,6 +10,9 @@ export default function ProductScan() {
 
   const [quantity, setQuantity] = React.useState(0)
   const [isDisabled, setIsDisabled] = React.useState(false)
+  const [product, setProduct] = React.useState<Product | null>(null)
+
+  const { line_code } = useLocalSearchParams()
   
 
   if(quantity == 0 && !isDisabled) {
@@ -17,7 +20,31 @@ export default function ProductScan() {
   } else if(quantity > 0 && isDisabled){
     setIsDisabled(false)
   }
-    
+
+  React.useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/products/AZZ5152`)
+
+        const data = await response.json()
+        setProduct(data)
+      } catch (error) {
+        console.error("Failed to fetch product", error)
+      }
+    }
+    if(line_code) {
+      fetchProduct()
+    }
+  }, [line_code])
+  
+  interface Product {
+    line_code: string;
+    line_description: string;
+    unit_price: number;
+    supplier: string;
+    nappi_code?: string;
+    image_url?: string;
+  }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -34,16 +61,21 @@ export default function ProductScan() {
 
                 {/* Product Details Card */}
                 <View style={styles.productCard} >
-                    <View style={styles.productHeader}>
-                        <Image source={{ uri: "/placeholder.svg?height=80&width=80"}} style={styles.productImage} />
+                    
+                    {product ? (
+                      <View style={styles.productHeader}>
+                        <Image source={{ uri: product.image_url}} style={styles.productImage} />
                         <View style={styles.productInfo}>
-                            <Text style={styles.productName}>Surgical Scalpel Set</Text>
-                            <Text style={styles.productCategory}>Surgical Instruments</Text>
-                            <Text style={styles.productSupplier}>by MedTech Solutions</Text>
-                            <Text style={styles.productPrice}>R45 per unit</Text>
-                                 
+                            <Text style={styles.productName}>{product.line_description}</Text>
+                            <Text style={styles.productCategory}>{product.line_code}</Text>
+                            <Text style={styles.productSupplier}>{product.supplier}</Text>
+                            <Text style={styles.productPrice}>R{product.unit_price}</Text>
+                            
                         </View>
                     </View>
+                    ): (
+                      <Text>Loading product...</Text>
+                    )}
 
                     <Text style={styles.productDescription}>
             Premium stainless steel surgical scalpels with disposable blades for precision medical procedures
