@@ -40,7 +40,7 @@ pool.connect((err, client, release) => {
 })
 
 
-
+// GET product details after QR Code scan
 app.get('/products/:line_code', async (req, res) => {
     const { line_code } = req.params
 
@@ -58,6 +58,43 @@ app.get('/products/:line_code', async (req, res) => {
             details: error.stack // Optional: for debugging
         })
     }
+})
+
+// POST delivery into deliveries table after submitting delivery
+app.post("/deliveries", async(req, res) => {
+  const { user_id, supplier, subtotal, total, vat_amount, quantity} = req.body
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO deliveries (user_id, supplier, subtotal, total, vat_amount, quantity)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING deliv_id`,
+      [user_id, supplier, subtotal, total, vat_amount, quantity]
+    )
+
+    res.status(201).json({ deliv_id: result.rows[0].deliv_id })
+  } catch (error) {
+    console.error("Failed to create delivery", error)
+
+    res.status(500).json({ error: "Failed to create delivery"})
+  }
+
+}) 
+
+
+// POST delivery items from delivery
+
+app.post("delivery_items", async (req, res) => {
+  const { deliv_id, line_code, product_description, unit_price, quantity } = req.body
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO delivery_items (deliv_id, line_code, product_description, unit_price, quantity)
+      VALUES ($1)`
+    )
+  } catch (error) {
+    
+  }
 })
 
 app.listen(port, () => {

@@ -1,17 +1,34 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams } from "expo-router";
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { Stack, useLocalSearchParams, router } from "expo-router";
 import React from "react";
 import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDelivery } from "../context/DeliveryContext";
+import { UserInfo, User } from "firebase/auth";
 
 
 
 export default function ProductScan() {
 
+  
+
+   interface Product {
+    line_code: string;
+    line_description: string;
+    unit_price: number;
+    supplier: string;
+    nappi_code?: string;
+    image_url?: string;
+  }
+
   const [quantity, setQuantity] = React.useState(0)
   const [isDisabled, setIsDisabled] = React.useState(false)
   const [product, setProduct] = React.useState<Product | null>(null)
 
+  
+  
+  
   const { line_code } = useLocalSearchParams()
   
 
@@ -24,9 +41,11 @@ export default function ProductScan() {
   React.useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/products/AZZ5152`)
+        const response = await fetch(`https://expoqrbackend.onrender.com/products/${line_code}`)
 
         const data = await response.json()
+
+        console.log("Product fetched:", data)
         setProduct(data)
       } catch (error) {
         console.error("Failed to fetch product", error)
@@ -35,16 +54,78 @@ export default function ProductScan() {
     if(line_code) {
       fetchProduct()
     }
+
+    
   }, [line_code])
   
-  interface Product {
-    line_code: string;
-    line_description: string;
-    unit_price: number;
-    supplier: string;
-    nappi_code?: string;
-    image_url?: string;
-  }
+ 
+
+  
+    const { addItem, items, clearItems } = useDelivery()
+
+    const handleAddToDelivery = () => {
+      if (!product || quantity <= 0) return
+
+      const deliveryItem = {
+        line_code: product.line_code,
+        product_name: product.line_description,
+        quantity,
+        unit_price: product.unit_price,
+        supplier: product.supplier
+      }
+
+      addItem(deliveryItem)
+      alert("Item added to delivery")
+
+      setQuantity(0)
+    }
+
+    const handleConfirmDeliver = async () => {
+      if(items.length === 0) {
+        alert("No items in delivery")
+        return
+      }
+
+      const supplier = items[0].supplier
+      const user_id = ""
+      const subtotal = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
+      const vat_amount = +(subtotal * 0.15).toFixed(2)
+      const total = +(subtotal + vat_amount).toFixed(2)
+      const quantity = items.reduce((sum, item) => sum + item.quantity, 0)
+
+      try {
+        const deliveryRes = await fetch("", {
+          method: "POST",
+          headers: { "Content-Type": "application/json"},
+          body: JSON.stringify({
+            user_id,
+            supplier,
+            subtotal,
+            total,
+            vat_amount,
+            quantity
+          })
+        })
+
+        const { deliv_id } = await deliveryRes.json()
+
+        for(let item of items) {
+          await fetch("", {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify({ ...item, deliv_id})
+          })
+        }
+
+        clearItems()
+        alert("Delivery submitted")
+        router.replace("/")
+      } catch (error) {
+        console.error(error)
+        alert("Failed to confirm delivery")
+      }
+    }
+  
 
     return (
         <SafeAreaView style={styles.container}>
@@ -52,7 +133,7 @@ export default function ProductScan() {
                 {/*Header */}
 
                 <View style={styles.header} >
-                    <TouchableOpacity style={styles.backArrow} >
+                    <TouchableOpacity style={styles.backArrow} onPress={() => router.replace("/")}>
                         <Ionicons name="arrow-back" size={24} color="#374151" />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Product Delivery</Text>
@@ -105,16 +186,21 @@ export default function ProductScan() {
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.totalText}>Total Value: R45</Text>
+                    {product && <Text style={styles.totalText}>Total Value: R{product?.unit_price *  quantity}</Text>}
                     </View>
 
                     
 
-                <View style={{ justifyContent: "center", alignItems: "center"}}>
+                <View style={{ justifyContent: "center", alignItems: "center", gap: 35}}>
+                  <TouchableOpacity style={styles.confirmButton} onPress={handleAddToDelivery}>
+                    <AntDesign name="pluscircle" size={25} color="#FFFFFF" />
+                    <Text style={styles.confirmButtonText}>Add to Delivery</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity style={styles.confirmButton}>
                       <Ionicons name="checkmark-circle" size={25} color="#FFFFFF"/>
                       <Text style={styles.confirmButtonText}>Confirm Delivery</Text>
                   </TouchableOpacity>
+                  
                 </View>
 
             </ScrollView>
