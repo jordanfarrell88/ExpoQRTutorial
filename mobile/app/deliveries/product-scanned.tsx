@@ -64,7 +64,7 @@ export default function ProductScan() {
 
       const deliveryItem = {
         line_code: product.line_code,
-        product_name: product.line_description,
+        product_description: product.line_description,
         quantity,
         unit_price: product.unit_price,
         supplier: product.supplier

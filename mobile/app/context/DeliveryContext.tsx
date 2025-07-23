@@ -2,7 +2,7 @@ import React from 'react'
 
 type DeliveryItem = {
     line_code: string;
-    product_name: string;
+    product_description: string;
     quantity: number;
     unit_price: number;
     supplier: string;
