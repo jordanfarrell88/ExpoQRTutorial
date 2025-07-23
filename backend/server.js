@@ -84,16 +84,22 @@ app.post("/deliveries", async(req, res) => {
 
 // POST delivery items from delivery
 
-app.post("delivery_items", async (req, res) => {
+app.post("/delivery_items", async (req, res) => {
   const { deliv_id, line_code, product_description, unit_price, quantity } = req.body
 
   try {
     const result = await pool.query(
       `INSERT INTO delivery_items (deliv_id, line_code, product_description, unit_price, quantity)
-      VALUES ($1)`
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *`,
+      [deliv_id, line_code, product_description, unit_price, quantity]
     )
+
+    res.status(201).json(result.rows[0])
   } catch (error) {
-    
+    console.error("Failed to add delivery item", error)
+
+    res.status(500).json({error: "Failed to add item to delivery"})
   }
 })
 

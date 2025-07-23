@@ -54,13 +54,9 @@ export default function ProductScan() {
     if(line_code) {
       fetchProduct()
     }
-
-    
   }, [line_code])
   
  
-
-  
     const { addItem, items, clearItems } = useDelivery()
 
     const handleAddToDelivery = () => {
@@ -80,21 +76,21 @@ export default function ProductScan() {
       setQuantity(0)
     }
 
-    const handleConfirmDeliver = async () => {
+    const handleConfirmDelivery = async () => {
       if(items.length === 0) {
         alert("No items in delivery")
         return
       }
 
       const supplier = items[0].supplier
-      const user_id = ""
+      const user_id = "jordan123"
       const subtotal = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
       const vat_amount = +(subtotal * 0.15).toFixed(2)
       const total = +(subtotal + vat_amount).toFixed(2)
       const quantity = items.reduce((sum, item) => sum + item.quantity, 0)
 
       try {
-        const deliveryRes = await fetch("", {
+        const deliveryRes = await fetch("https://expoqrbackend.onrender.com/deliveries", {
           method: "POST",
           headers: { "Content-Type": "application/json"},
           body: JSON.stringify({
@@ -110,7 +106,7 @@ export default function ProductScan() {
         const { deliv_id } = await deliveryRes.json()
 
         for(let item of items) {
-          await fetch("", {
+          await fetch("https://expoqrbackend.onrender.com/delivery_items", {
             method: "POST",
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify({ ...item, deliv_id})
@@ -196,7 +192,7 @@ export default function ProductScan() {
                     <AntDesign name="pluscircle" size={25} color="#FFFFFF" />
                     <Text style={styles.confirmButtonText}>Add to Delivery</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.confirmButton}>
+                  <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmDelivery}>
                       <Ionicons name="checkmark-circle" size={25} color="#FFFFFF"/>
                       <Text style={styles.confirmButtonText}>Confirm Delivery</Text>
                   </TouchableOpacity>
