@@ -27,6 +27,7 @@ export const DeliveryProvider = ({ children}: {
     setItems((prev) => [...prev, item])
 }
 
+    
     const clearItems = () => setItems([])
 
     return (

@@ -25,6 +25,7 @@ export default function ProductScan() {
   const [quantity, setQuantity] = React.useState(0)
   const [isDisabled, setIsDisabled] = React.useState(false)
   const [product, setProduct] = React.useState<Product | null>(null)
+  
 
   
   
@@ -185,9 +186,29 @@ export default function ProductScan() {
                     {product && <Text style={styles.totalText}>Total Value: R{product?.unit_price *  quantity}</Text>}
                     </View>
 
-                    
+                
 
-                <View style={{ justifyContent: "center", alignItems: "center", gap: 35}}>
+                  <View style={styles.quantityCard}>
+                    <Text style={styles.sectionTitle}>Delivery Items</Text>
+                    <View >
+                      {items.length === 0 ? 
+                      <View style={{ justifyContent: "center", alignItems: "center"}}>
+                        <Text style={styles.noItemsText}>No delivery Items yet</Text>
+                      </View>
+                        : (
+                          items.map((item, idx) => (
+                            <View key={item.line_code + idx} style={styles.itemsText}> 
+                              <Text style={{paddingEnd: 80}}>{item.line_code}</Text>
+                              <Text>{item.quantity}</Text>
+                              <Text>R{item.quantity * item.unit_price}</Text>
+                            </View>
+                          ))
+                        ) 
+                      }
+                    </View>
+                  </View>
+                
+                <View style={{ justifyContent: "center", alignItems: "center", gap: 10,flexDirection: "row"}}>
                   <TouchableOpacity style={styles.confirmButton} onPress={handleAddToDelivery}>
                     <AntDesign name="pluscircle" size={25} color="#FFFFFF" />
                     <Text style={styles.confirmButtonText}>Add to Delivery</Text>
@@ -314,7 +335,7 @@ const styles = StyleSheet.create({
   quantityCard: {
     backgroundColor: "#ffffff",
     marginHorizontal: 16,
-    marginBottom: 70,
+    marginBottom: 20,
     borderRadius: 12,
     padding: 20,
     shadowColor: "#000",
@@ -394,6 +415,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     minHeight: 100,
   },
+  noItemsText: {
+    fontSize: 21,
+    fontStyle: "italic",
+    marginTop: 30,
+    marginBottom: 20
+  },
+  itemsText: {
+    gap: 70,
+    flexDirection: "row",
+    marginTop: 10
+
+  },
   confirmButton: {
     backgroundColor: "#2563eb",
     marginHorizontal: 8,
@@ -410,12 +443,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    height:90,
-    width: 250
+    height:70,
+    width: 170
+  },
+  itemsCard: {
+    backgroundColor: "#ffffff",
+    marginHorizontal: 16,
+    marginBottom: 20,
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   confirmButtonText: {
     color: "#ffffff",
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "600",
     marginLeft: 8,
     
