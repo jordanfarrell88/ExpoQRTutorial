@@ -105,25 +105,38 @@ app.post("/delivery_items", async (req, res) => {
 
 // GET recent deliveries and their items
 
-app.get("/recent-deliveries/user/:user_id", async (res,res) => {
+app.get("/deliveries/user/:user_id", async (req, res) => {
 
   const { user_id } = req.params
 
   try {
+    console.log("Searching for user", user_id)
+
     const deliveriesResult = await pool.query(
-      'SELECT TOP 20 * FROM deliveries WHERE user_id = $1 ORDER BY delivered_at DESC', [user_id]
+      'SELECT * FROM deliveries WHERE user_id = $1 ORDER BY delivered_at DESC LIMIT 20 ', [user_id]
     )
+    
+
+    console.log("Found deliveries", deliveriesResult.rows.length)
+
+    if (deliveriesResult.rows.length === 0) {
+      return res.json([]) // Return empty array if no deliveries found
+    }
+
     const deliveries = deliveriesResult.rows
 
     for (let delivery of deliveries) {
       const itemsResult = await pool.query(
-        'SELECT line_code, product_description, quantity, unit_price, supplier FROM delivery_items WHERE deliv_id = $1',
+        'SELECT line_code, product_description, quantity, unit_price, total_price FROM delivery_items WHERE deliv_id = $1',
       [delivery.deliv_id]
       )
       delivery.items = itemsResult.rows
     }
+
+    res.json(deliveries)
   } catch (error) {
-    console.error("Could not load deliveries", error)
+    console.error("Detailed error", error.message)
+    console.error("Error stack", error.stack)
 
     res.status(500).json({ error: "Could not load deliveries. Please try again later"})
   }

@@ -13,7 +13,7 @@ interface DeliveryItem {
   product_description: string
   quantity: number
   unit_price: number
-  supplier: string
+  total_price: string
 }
 
 interface Delivery {
@@ -24,7 +24,7 @@ interface Delivery {
   total: number
   vat_amount: number
   quantity: number
-  created_at: string
+  delivered_at: string
   items: DeliveryItem[]
 }
 
@@ -47,7 +47,7 @@ export default function RecentDeliveries() {
 
         //const userId= auth.currentUser?.uid
         const userId = "jordan123"
-        const response = await fetch(`https://expoqrbackend.onrender.com/recent-deliveries/user/${userId}`)
+        const response = await fetch(`https://expoqrbackend.onrender.com/deliveries/user/${userId}`)
         const data = await response.json()
 
         setDeliveries(data)
@@ -125,7 +125,7 @@ export default function RecentDeliveries() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        {/* Summary Stats */}
+        {/* Summary Stats 
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>Delivery Summary</Text>
           <View style={styles.summaryStats}>
@@ -146,6 +146,8 @@ export default function RecentDeliveries() {
           </View>
         </View>
 
+        */}
+
         {/* Deliveries List */}
         {deliveries.length === 0 ? (
           <View style={styles.emptyContainer}>
@@ -160,13 +162,13 @@ export default function RecentDeliveries() {
                 <View style={styles.deliveryMainInfo}>
                   <View style={styles.deliveryTitleRow}>
                     <Text style={styles.deliveryId}>#{delivery.deliv_id}</Text>
-                    <View style={[styles.statusDot, { backgroundColor: getStatusColor(delivery.created_at) }]} />
+                    <View style={[styles.statusDot, { backgroundColor: getStatusColor(delivery.delivered_at) }]} />
                   </View>
                   <Text style={styles.supplierName}>{delivery.supplier}</Text>
-                  <Text style={styles.deliveryDate}>{formatDate(delivery.created_at)}</Text>
+                  <Text style={styles.deliveryDate}>{formatDate(delivery.delivered_at)}</Text>
                 </View>
                 <View style={styles.deliveryStats}>
-                  <Text style={styles.deliveryTotal}>R{delivery.total.toFixed(2)}</Text>
+                  <Text style={styles.deliveryTotal}>R{delivery.total}</Text>
                   <Text style={styles.deliveryQuantity}>{delivery.quantity} items</Text>
                   <Ionicons
                     name={expandedDelivery === delivery.deliv_id ? "chevron-up" : "chevron-down"}
@@ -190,7 +192,7 @@ export default function RecentDeliveries() {
                       </View>
                       <View style={styles.itemStats}>
                         <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
-                        <Text style={styles.itemPrice}>R{(item.unit_price * item.quantity).toFixed(2)}</Text>
+                        <Text style={styles.itemPrice}>R{(item.unit_price * item.quantity)}</Text>
                       </View>
                     </View>
                   ))}
@@ -198,15 +200,15 @@ export default function RecentDeliveries() {
                   <View style={styles.deliveryTotals}>
                     <View style={styles.totalRow}>
                       <Text style={styles.totalLabel}>Subtotal:</Text>
-                      <Text style={styles.totalValue}>R{delivery.subtotal.toFixed(2)}</Text>
+                      <Text style={styles.totalValue}>R{delivery.subtotal}</Text>
                     </View>
                     <View style={styles.totalRow}>
                       <Text style={styles.totalLabel}>VAT (15%):</Text>
-                      <Text style={styles.totalValue}>R{delivery.vat_amount.toFixed(2)}</Text>
+                      <Text style={styles.totalValue}>R{delivery.vat_amount}</Text>
                     </View>
                     <View style={[styles.totalRow, styles.finalTotal]}>
                       <Text style={styles.finalTotalLabel}>Total:</Text>
-                      <Text style={styles.finalTotalValue}>R{delivery.total.toFixed(2)}</Text>
+                      <Text style={styles.finalTotalValue}>R{delivery.total}</Text>
                     </View>
                   </View>
                 </View>
