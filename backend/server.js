@@ -105,7 +105,7 @@ app.post("/delivery_items", async (req, res) => {
 
 // GET recent deliveries and their items
 
-app.get("/deliveries/user/:user_id", async (req, res) => {
+app.get("/deliveries/recent", async (req, res) => {
 
   const { user_id } = req.params
 
@@ -113,7 +113,7 @@ app.get("/deliveries/user/:user_id", async (req, res) => {
     console.log("Searching for user", user_id)
 
     const deliveriesResult = await pool.query(
-      'SELECT * FROM deliveries WHERE user_id = $1 ORDER BY delivered_at DESC LIMIT 20 ', [user_id]
+      'SELECT * FROM deliveries ORDER BY delivered_at DESC LIMIT 20 '
     )
     
 

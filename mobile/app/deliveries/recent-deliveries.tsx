@@ -47,12 +47,13 @@ export default function RecentDeliveries() {
 
         //const userId= auth.currentUser?.uid
         const userId = "jordan123"
-        const response = await fetch(`https://expoqrbackend.onrender.com/deliveries/user/${userId}`)
+        const response = await fetch(`https://expoqrbackend.onrender.com/deliveries/recent`)
         const data = await response.json()
 
         setDeliveries(data)
     } catch (error) {
         console.error("Error fetching deliveries", error)
+        
         
     } finally {
         setLoading(false)
@@ -71,8 +72,7 @@ export default function RecentDeliveries() {
       year: "numeric",
       month: "short",
       day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      
     })
   }
 
@@ -162,7 +162,7 @@ export default function RecentDeliveries() {
                 <View style={styles.deliveryMainInfo}>
                   <View style={styles.deliveryTitleRow}>
                     <Text style={styles.deliveryId}>#{delivery.deliv_id}</Text>
-                    <View style={[styles.statusDot, { backgroundColor: getStatusColor(delivery.delivered_at) }]} />
+                    
                   </View>
                   <Text style={styles.supplierName}>{delivery.supplier}</Text>
                   <Text style={styles.deliveryDate}>{formatDate(delivery.delivered_at)}</Text>
@@ -215,10 +215,19 @@ export default function RecentDeliveries() {
               )}
             </View>
           ))
+          
         )}
+
+        
 
         <View style={styles.bottomPadding} />
       </ScrollView>
+        <View style={styles.buttonView}>
+        <TouchableOpacity style={styles.newOrderButton} onPress={() => router.push("/scanner")}>
+            <Text style={styles.orderButtonText}>Scan new delivery</Text>
+        </TouchableOpacity>
+      </View>
+      
     </SafeAreaView>
   )
 }
@@ -237,6 +246,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
+    marginBottom: 20,
     backgroundColor: "#ffffff",
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
@@ -469,4 +479,24 @@ const styles = StyleSheet.create({
   bottomPadding: {
     height: 32,
   },
+  newOrderButton: {
+    backgroundColor: "#2563eb",
+    height: 70,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  buttonView: {
+    marginBottom: 20,
+    marginHorizontal: 50,
+    height: 100,
+    width: 300,
+    justifyContent: "center",
+  },
+  orderButtonText: {
+    color: "#ffffff",
+    fontSize: 17,
+    fontWeight: "600",
+    
+  }
 })
