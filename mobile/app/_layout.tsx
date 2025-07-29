@@ -8,11 +8,13 @@ export default function Layout() {
       <Stack 
       screenOptions={{
         headerShown: false,
+        
       }}
       >
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="index" />
         <Stack.Screen name="deliveries/product-scanned" />
+        <Stack.Screen name="delivieries/recent-deliveries" />
       </Stack>
   </DeliveryProvider>
   

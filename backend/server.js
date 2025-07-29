@@ -103,6 +103,32 @@ app.post("/delivery_items", async (req, res) => {
   }
 })
 
+// GET recent deliveries and their items
+
+app.get("/recent-deliveries/user/:user_id", async (res,res) => {
+
+  const { user_id } = req.params
+
+  try {
+    const deliveriesResult = await pool.query(
+      'SELECT TOP 20 * FROM deliveries WHERE user_id = $1 ORDER BY delivered_at DESC', [user_id]
+    )
+    const deliveries = deliveriesResult.rows
+
+    for (let delivery of deliveries) {
+      const itemsResult = await pool.query(
+        'SELECT line_code, product_description, quantity, unit_price, supplier FROM delivery_items WHERE deliv_id = $1',
+      [delivery.deliv_id]
+      )
+      delivery.items = itemsResult.rows
+    }
+  } catch (error) {
+    console.error("Could not load deliveries", error)
+
+    res.status(500).json({ error: "Could not load deliveries. Please try again later"})
+  }
+})
+
 app.listen(port, () => {
     console.log('Server is running on http://localhost:', port)
 })
