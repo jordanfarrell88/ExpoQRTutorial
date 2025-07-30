@@ -142,6 +142,21 @@ app.get("/deliveries/recent", async (req, res) => {
   }
 })
 
+// DELETE delivery by deliv_id
+app.delete("/deliveries/:deliv_id", async (req, res) => {
+  const { deliv_id } = req.params
+
+  try {
+    const deleteResult = await pool.query(`DELETE FROM deliveries WHERE deliv_id = $1`, [deliv_id])
+
+    res.status(201).json(deleteResult.rows[0])
+  } catch (error) {
+    console.error("Could not delete Record.", error.message)
+
+    res.status(500).json({error: `Could not delete delivery: ${error.message} AND ${error.stack}`})
+  }
+})
+
 app.listen(port, () => {
     console.log('Server is running on http://localhost:', port)
 })

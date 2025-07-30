@@ -80,6 +80,10 @@ export default function RecentDeliveries() {
     setExpandedDelivery(expandedDelivery === deliveryId ? null : deliveryId)
   }
 
+  const handleDelete = () => {
+    
+  }
+
   const getStatusColor = (date: string) => {
     const deliveryDate = new Date(date)
     const now = new Date()
@@ -182,6 +186,9 @@ export default function RecentDeliveries() {
                 <View style={styles.deliveryDetails}>
                   <View style={styles.detailsHeader}>
                     <Text style={styles.detailsTitle}>Delivery Items</Text>
+                    <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+                        <Ionicons style={styles.deleteIcon} name="trash" />
+                    </TouchableOpacity>
                   </View>
 
                   {delivery.items.map((item, index) => (
@@ -215,11 +222,7 @@ export default function RecentDeliveries() {
               )}
             </View>
           ))
-          
         )}
-
-        
-
         <View style={styles.bottomPadding} />
       </ScrollView>
         <View style={styles.buttonView}>
@@ -400,6 +403,15 @@ const styles = StyleSheet.create({
   },
   detailsHeader: {
     marginBottom: 12,
+    flexDirection: "row"
+  },
+  deleteButton: {
+    paddingLeft: 250,
+    
+    
+  },
+  deleteIcon: {
+    
   },
   detailsTitle: {
     fontSize: 14,

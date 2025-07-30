@@ -7,11 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useDelivery } from "../context/DeliveryContext";
 import { UserInfo, User } from "firebase/auth";
 
-
-
 export default function ProductScan() {
-
-  
 
    interface Product {
     line_code: string;
@@ -26,13 +22,8 @@ export default function ProductScan() {
   const [isDisabled, setIsDisabled] = React.useState(false)
   const [product, setProduct] = React.useState<Product | null>(null)
   
-
-  
-  
-  
   const { line_code } = useLocalSearchParams()
   
-
   if(quantity == 0 && !isDisabled) {
     setIsDisabled(true)
   } else if(quantity > 0 && isDisabled){
@@ -57,7 +48,6 @@ export default function ProductScan() {
     }
   }, [line_code])
   
- 
     const { addItem, items, clearItems } = useDelivery()
 
     const handleAddToDelivery = () => {
@@ -75,6 +65,11 @@ export default function ProductScan() {
       alert("Item added to delivery")
 
       setQuantity(0)
+    }
+
+    const handleNewScan = () => {
+
+      router.push("/scanner")
     }
 
     const handleConfirmDelivery = async () => {
@@ -123,7 +118,6 @@ export default function ProductScan() {
       }
     }
   
-
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} >
@@ -155,11 +149,7 @@ export default function ProductScan() {
                       <Text>Loading product...</Text>
                     )}
 
-                    <Text style={styles.productDescription}>
-            Premium stainless steel surgical scalpels with disposable blades for precision medical procedures
-                    </Text>
 
-                    
                     </View>
 
                     {/* Quantity Selection */}
@@ -188,43 +178,52 @@ export default function ProductScan() {
 
                 
 
-                  <View style={styles.quantityCard}>
+                  
+                    <View style={styles.quantityCard}>
                     <Text style={styles.sectionTitle}>Delivery Items</Text>
-                    <View >
-                      {items.length === 0 ? 
-                      <View style={{ justifyContent: "center", alignItems: "center"}}>
-                        <Text style={styles.noItemsText}>No delivery Items yet</Text>
+                    <ScrollView style={styles.scrollViewItems}>
+                      <View >
+                        {items.length === 0 ? 
+                        <View style={{ justifyContent: "center", alignItems: "center"}}>
+                          <Text style={styles.noItemsText}>No delivery Items yet</Text>
+                        </View>
+                          : (
+                            items.map((item, idx) => (
+                              <View key={item.line_code + idx} style={styles.itemsText}> 
+                                <Text style={{paddingEnd: 80}}>{item.line_code}</Text>
+                                <Text>{item.quantity}</Text>
+                                <Text>R{item.quantity * item.unit_price}</Text>
+                              </View>
+                            ))
+                          ) 
+                        }
                       </View>
-                        : (
-                          items.map((item, idx) => (
-                            <View key={item.line_code + idx} style={styles.itemsText}> 
-                              <Text style={{paddingEnd: 80}}>{item.line_code}</Text>
-                              <Text>{item.quantity}</Text>
-                              <Text>R{item.quantity * item.unit_price}</Text>
-                            </View>
-                          ))
-                        ) 
-                      }
-                    </View>
+                    </ScrollView>
                   </View>
+                  
                 
                 <View style={{ justifyContent: "center", alignItems: "center", gap: 10,flexDirection: "row"}}>
-                  <TouchableOpacity style={styles.confirmButton} onPress={handleAddToDelivery}>
+                  <TouchableOpacity style={styles.bottomButton} onPress={handleAddToDelivery}>
                     <AntDesign name="pluscircle" size={25} color="#FFFFFF" />
                     <Text style={styles.confirmButtonText}>Add to Delivery</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity style={styles.bottomButton} onPress={handleNewScan}>
+                    <AntDesign name="pluscircle" size={25} color="#FFFFFF" />
+                    <Text style={styles.confirmButtonText}>Scan New Item</Text>
+                  </TouchableOpacity>
+                  
+                </View>
+                <View style={styles.confirmView}>
                   <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmDelivery}>
                       <Ionicons name="checkmark-circle" size={25} color="#FFFFFF"/>
                       <Text style={styles.confirmButtonText}>Confirm Delivery</Text>
                   </TouchableOpacity>
-                  
                 </View>
 
             </ScrollView>
         </SafeAreaView>
     )
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -427,7 +426,7 @@ const styles = StyleSheet.create({
     marginTop: 10
 
   },
-  confirmButton: {
+  bottomButton: {
     backgroundColor: "#2563eb",
     marginHorizontal: 8,
     borderRadius: 12,
@@ -445,6 +444,30 @@ const styles = StyleSheet.create({
     elevation: 3,
     height:70,
     width: 170
+  },
+  confirmButton: {
+    backgroundColor: "#2563eb",
+    marginHorizontal: 8,
+    borderRadius: 12,
+    paddingVertical: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    height:70,
+    width: 364
+  },
+  confirmView: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 20,
   },
   itemsCard: {
     backgroundColor: "#ffffff",
@@ -471,4 +494,8 @@ const styles = StyleSheet.create({
   bottomPadding: {
     height: 32,
   },
+  scrollViewItems: {
+    height: 115,
+    
+  }
 })
