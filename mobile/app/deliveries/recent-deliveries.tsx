@@ -4,7 +4,7 @@ import { auth } from "@/config/firebase"
 import { Ionicons } from "@expo/vector-icons"
 import { router } from "expo-router"
 import { useState, useEffect } from "react"
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl } from "react-native"
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl, Alert } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 
@@ -33,6 +33,7 @@ export default function RecentDeliveries() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [expandedDelivery, setExpandedDelivery] = useState<string | null>(null)
+  
 
   // Mock data for demonstration - replace with your API call
   
@@ -80,18 +81,42 @@ export default function RecentDeliveries() {
     setExpandedDelivery(expandedDelivery === deliveryId ? null : deliveryId)
   }
 
-  const handleDelete = () => {
-    
-  }
+  const handleDelete = async (delivId: string) => {
 
-  const getStatusColor = (date: string) => {
-    const deliveryDate = new Date(date)
-    const now = new Date()
-    const diffHours = (now.getTime() - deliveryDate.getTime()) / (1000 * 3600)
+    let confirmDelete = false
 
-    if (diffHours < 24) return "#10b981" // Green for recent
-    if (diffHours < 72) return "#f59e0b" // Orange for 1-3 days
-    return "#6b7280" // Gray for older
+    try {
+        await Alert.alert("Delete Delivery", "Are you sure you want to delete this delivery?",
+            [{
+                text: "Cancel",
+                style: "cancel"
+            },
+            {
+                text: "Yes",
+                onPress: () => confirmDelete = true
+            }]
+        ) 
+
+        if(!confirmDelete){
+            Alert.alert("Accept!!!")
+        }
+
+        const res = await fetch(`https://expoqrbackend.onrender.com/deliveries/${delivId}`,
+            {
+                method: "DELETE"
+            }
+        )
+
+        if(!res.ok) {
+            throw new Error("Failed to delete delivery")
+        }
+
+        setDeliveries(prev => prev.filter(d => d.deliv_id !== delivId))
+        setExpandedDelivery(null)
+    } catch (error) {
+        console.error("Could not delete delivery", error)
+        Alert.alert("Error: Could not delete delivery", "Please try again later")
+    }
   }
 
   if (loading) {
