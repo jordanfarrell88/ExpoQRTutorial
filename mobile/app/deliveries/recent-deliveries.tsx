@@ -81,42 +81,33 @@ export default function RecentDeliveries() {
     setExpandedDelivery(expandedDelivery === deliveryId ? null : deliveryId)
   }
 
-  const handleDelete = async (delivId: string) => {
-
-    let confirmDelete = false
-
-    try {
-        await Alert.alert("Delete Delivery", "Are you sure you want to delete this delivery?",
+  const handleDelete = (delivId: string) => {
+    Alert.alert("Delete Delivery", "Are you sure you want to delete this delivery?",
             [{
                 text: "Cancel",
                 style: "cancel"
             },
             {
                 text: "Yes",
-                onPress: () => confirmDelete = true
+                style: "destructive",
+                onPress: async () => {
+                    try {
+                        const res = await fetch(`https://expoqrbackend.onrender.com/deliveries/${delivId}`, {
+                            method: "DELETE",
+                        })
+                        if(!res.ok) throw new Error("Failed to delete delivery")
+                            
+                        setDeliveries((prev) => prev.filter((d) => d.deliv_id !== delivId))
+                        setExpandedDelivery(null)
+
+                        Alert.alert("Product deleted?")
+                    } catch (error) {
+                        console.error("Could not delete delivery", error)
+                        Alert.alert("Error: Could not delete delivery", "Please try again later")
+                    }
+                }
             }]
         ) 
-
-        if(!confirmDelete){
-            Alert.alert("Accept!!!")
-        }
-
-        const res = await fetch(`https://expoqrbackend.onrender.com/deliveries/${delivId}`,
-            {
-                method: "DELETE"
-            }
-        )
-
-        if(!res.ok) {
-            throw new Error("Failed to delete delivery")
-        }
-
-        setDeliveries(prev => prev.filter(d => d.deliv_id !== delivId))
-        setExpandedDelivery(null)
-    } catch (error) {
-        console.error("Could not delete delivery", error)
-        Alert.alert("Error: Could not delete delivery", "Please try again later")
-    }
   }
 
   if (loading) {
@@ -211,7 +202,7 @@ export default function RecentDeliveries() {
                 <View style={styles.deliveryDetails}>
                   <View style={styles.detailsHeader}>
                     <Text style={styles.detailsTitle}>Delivery Items</Text>
-                    <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+                    <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(delivery.deliv_id)}>
                         <Ionicons style={styles.deleteIcon} name="trash" />
                     </TouchableOpacity>
                   </View>
