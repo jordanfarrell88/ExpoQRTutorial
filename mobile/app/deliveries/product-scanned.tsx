@@ -6,6 +6,7 @@ import { Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDelivery } from "../context/DeliveryContext";
 import { UserInfo, User } from "firebase/auth";
+import { auth } from "@/config/firebase";
 
 export default function ProductScan() {
 
@@ -79,7 +80,7 @@ export default function ProductScan() {
       }
 
       const supplier = items[0].supplier
-      const user_id = "jordan123"
+      const user_id = auth.currentUser?.uid
       const subtotal = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
       const vat_amount = +(subtotal * 0.15).toFixed(2)
       const total = +(subtotal + vat_amount).toFixed(2)

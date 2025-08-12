@@ -6,7 +6,8 @@ import { router } from "expo-router"
 import { useState, useEffect } from "react"
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, RefreshControl, Alert } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
-
+import * as Print from 'expo-print'
+import * as Sharing from 'expo-sharing'
 
 interface DeliveryItem {
   line_code: string
@@ -110,6 +111,50 @@ export default function RecentDeliveries() {
         ) 
   }
 
+  const handlePrint = async (delivery: Delivery) => {
+    
+    const html = `
+    <html>
+      <body>
+        <h1>Invoice: #${delivery.deliv_id}</h1>
+        <h2><strong>Supplier:</strong> ${delivery.supplier}</h2>
+        <p><strong>Date:</strong> ${new Date(delivery.delivered_at).toLocaleDateString()}</p>
+        <hr />
+        <table border="1" cellpadding="5" cellspacing="0" width="100%">
+          <tr>
+            <th>Line Code</th>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+          </tr>
+          ${delivery.items.map((item: { line_code: any; product_description: any; quantity: number; unit_price: number }) => `
+            <tr>
+              <td>${item.line_code}</td>
+              <td>${item.product_description}</td>
+              <td>${item.quantity}</td>
+              <td>R${item.unit_price}</td>
+              <td>R${(item.unit_price * item.quantity)}</td>
+            </tr>
+          `).join('')}
+        </table>
+        <hr />
+        <p><strong>Subtotal:</strong> R${delivery.subtotal}</p>
+        <p><strong>VAT (15%):</strong> R${delivery.vat_amount}</p>
+        <p><strong>Total:</strong> R${delivery.total}</p>
+      </body>
+    </html>
+  `;
+
+    const { uri } = await Print.printToFileAsync({ html })
+
+    if(await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: 'Share Invoice'})
+    } else {
+      alert("Sharing not available on this device")
+    }
+  }
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -190,6 +235,7 @@ export default function RecentDeliveries() {
                 <View style={styles.deliveryStats}>
                   <Text style={styles.deliveryTotal}>R{delivery.total}</Text>
                   <Text style={styles.deliveryQuantity}>{delivery.quantity} items</Text>
+                  
                   <Ionicons
                     name={expandedDelivery === delivery.deliv_id ? "chevron-up" : "chevron-down"}
                     size={20}
@@ -202,6 +248,9 @@ export default function RecentDeliveries() {
                 <View style={styles.deliveryDetails}>
                   <View style={styles.detailsHeader}>
                     <Text style={styles.detailsTitle}>Delivery Items</Text>
+                    <TouchableOpacity style={{ paddingLeft: 220}} onPress={() => handlePrint(delivery)} >
+                      <Ionicons style={styles.deleteIcon} name="document-outline" />
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(delivery.deliv_id)}>
                         <Ionicons style={styles.deleteIcon} name="trash" />
                     </TouchableOpacity>
@@ -422,9 +471,7 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   deleteButton: {
-    paddingLeft: 250,
-    
-    
+    paddingLeft: 25,
   },
   deleteIcon: {
     
