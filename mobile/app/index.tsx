@@ -69,8 +69,6 @@ export default function Home() {
           <Image source={require("../assets/images/SurgicomLogo.png")} style={styles.logo} />
           <Text style={styles.title}>Surgicom Networx</Text>
           <Text style={styles.subtitle}>Healthcare Professional Network</Text>
-
-          
         </View>
 
         {/* Main Actions */}
@@ -94,9 +92,20 @@ export default function Home() {
               <Text style={styles.secondaryActionSubtitle}>View delivery history</Text>
             </TouchableOpacity>
           </View>
+          <View style={styles.secondaryActionsGrid}>
+          <TouchableOpacity style={styles.secondaryAction} onPress={() => router.push("/storage/unstored")}>
+            <View style={styles.secondaryIconContainer}>
+              <Ionicons name="cube-outline" size={24} color="#2563eb" />
+            </View>
+            <Text style={styles.secondaryActionTitle}>Unstored Items</Text>
+            <Text style={styles.secondaryActionSubtitle}>View and store items</Text>
+          </TouchableOpacity>
+        </View>
         </View>
 
-        {/* Quick Stats */}
+        
+
+        {/* Quick Stats 
         <View style={styles.statsContainer}>
           <Text style={styles.statsTitle}>Today's Overview</Text>
           <View style={styles.statsGrid}>
@@ -111,6 +120,8 @@ export default function Home() {
             </View>
           </View>
         </View>
+
+        */}
 
         {/* Settings & Profile */}
         <View style={styles.bottomActions}>
@@ -243,7 +254,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   secondaryAction: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f7efefff",
     borderRadius: 12,
     padding: 16,
     width: 370,

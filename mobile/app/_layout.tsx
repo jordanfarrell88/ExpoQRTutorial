@@ -14,7 +14,8 @@ export default function Layout() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="index" />
         <Stack.Screen name="deliveries/product-scanned" />
-        <Stack.Screen name="delivieries/recent-deliveries" />
+        <Stack.Screen name="deliveries/recent-deliveries" />
+        <Stack.Screen name="storage/unstored" />
       </Stack>
   </DeliveryProvider>
   

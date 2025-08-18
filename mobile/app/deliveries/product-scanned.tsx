@@ -59,7 +59,8 @@ export default function ProductScan() {
         product_description: product.line_description,
         quantity,
         unit_price: product.unit_price,
-        supplier: product.supplier
+        supplier: product.supplier,
+        stored: false
       }
 
       addItem(deliveryItem)
@@ -85,6 +86,7 @@ export default function ProductScan() {
       const vat_amount = +(subtotal * 0.15).toFixed(2)
       const total = +(subtotal + vat_amount).toFixed(2)
       const quantity = items.reduce((sum, item) => sum + item.quantity, 0)
+      const stored = false
 
       try {
         const deliveryRes = await fetch("https://expoqrbackend.onrender.com/deliveries", {

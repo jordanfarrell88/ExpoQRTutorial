@@ -6,6 +6,7 @@ type DeliveryItem = {
     quantity: number;
     unit_price: number;
     supplier: string;
+    stored: boolean
   }
 
 type DeliveryContextType = {

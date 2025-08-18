@@ -85,14 +85,14 @@ app.post("/deliveries", async(req, res) => {
 // POST delivery items from delivery
 
 app.post("/delivery_items", async (req, res) => {
-  const { deliv_id, line_code, product_description, unit_price, quantity } = req.body
+  const { deliv_id, line_code, product_description, unit_price, quantity, stored } = req.body
 
   try {
     const result = await pool.query(
-      `INSERT INTO delivery_items (deliv_id, line_code, product_description, unit_price, quantity)
-      VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO delivery_items (deliv_id, line_code, product_description, unit_price, quantity, stored)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *`,
-      [deliv_id, line_code, product_description, unit_price, quantity]
+      [deliv_id, line_code, product_description, unit_price, quantity, stored]
     )
 
     res.status(201).json(result.rows[0])
@@ -155,6 +155,57 @@ app.delete("/deliveries/:deliv_id", async (req, res) => {
 
     res.status(500).json({error: `Could not delete delivery: ${error.message} AND ${error.stack}`})
   }
+})
+
+// GET delivery items that are not stored yet (stored = false)
+app.get("/storage/unstored", async (req, res) => {
+
+  try {
+    const storageResult = await pool.query(
+      `SELECT * FROM delivery_items 
+      WHERE stored = false
+      ORDER BY id`
+    )
+
+    console.log("Found items", storageResult.rows.length)
+
+    if (storageResult.rows.length === 0) {
+      return res.json([])
+    }
+
+    const storage = storageResult.rows
+
+    res.json(storage)
+  } catch (error) {
+    console.error("Detailed error", error.message)
+    console.error("Error stack", error.stack)
+
+    res.status(500).json({ error: "Could not load unstored items, Please try again later"})
+  }
+})
+
+app.put('/delivery_items/:item_id/storage', async (req, res) => {
+  const { item_id } = req.params
+  const { room_number, storage_location } = req.body
+
+  try {
+    const result = await pool.query(`
+        UPDATE delivery_items
+        SET room_number = $1, storage_location = $2, stored = true
+        WHERE id = $3
+        RETURNING *
+      `, [room_number, storage_location, item_id])
+
+      if(result.rows.length === 0) {
+        return res.status(404).json({ error: "Item not found" })
+      }
+      
+      res.json(result.rows[0])
+  } catch (error) {
+    console.error("Failed to update item location", error)
+    console.error(error.error, error.stack)
+  }
+  res.status(500).json({ error: "Failed to update item location"})
 })
 
 app.listen(port, () => {
