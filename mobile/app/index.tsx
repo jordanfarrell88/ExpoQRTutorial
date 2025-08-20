@@ -67,7 +67,7 @@ export default function Home() {
         {/* Header Section */}
         <View style={styles.header}>
           <Image source={require("../assets/images/SurgicomLogo.png")} style={styles.logo} />
-          <Text style={styles.title}>Surgicom Networx</Text>
+          <Text style={styles.title}>Surgicom Nettworx</Text>
           <Text style={styles.subtitle}>Healthcare Professional Network</Text>
         </View>
 

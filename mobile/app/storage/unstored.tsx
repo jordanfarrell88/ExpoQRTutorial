@@ -78,7 +78,20 @@ export default function UnstoredItems() {
     }
 
     const toggleExpanded = (id: string) => {
-        setExpandedDelivery(expandedDelivery === id ? null : id)
+
+        if(expandedDelivery === id) {
+            setExpandedDelivery(null)
+
+            setSelectedLocation("")
+            setSelectedRoom("")
+        }
+        else {
+            setSelectedLocation("")
+            setSelectedRoom("")
+            setExpandedDelivery(id)
+        }
+
+
     }
 
     if(loading) {
@@ -126,15 +139,16 @@ export default function UnstoredItems() {
                 ) : (
                     unstored.map((item) => (
 
-                        <View key={item.line_code} style={styles.itemCard}>
+                        <View key={item.id} style={styles.itemCard}>
                             <TouchableOpacity style={styles.itemHeader} onPress={() => toggleExpanded(item.id)}>
                                 <View style={styles.itemMainInfo} >
                                     <View style={styles.itemTitleRow}>
-                                        <Text style={styles.itemId}>#{item.line_code}</Text>
+                                        <Text style={styles.itemId}>#{item.id}</Text>
                                     </View>
+                                    <Text style={styles.supplierName}>{item.line_code}</Text>
                                     <Text style={styles.supplierName}>{item.product_description}</Text>
                                     <Text style={styles.deliveryDate}>Delivery: #{item.deliv_id}</Text>
-                                    <Text style={styles.deliveryDate}>Item: #{item.id}</Text>
+                                    
                                 </View>
                                 <View style={styles.itemStats}>
                                     <Text style={styles.itemTotal}>R{item.total_price}</Text>
@@ -168,9 +182,9 @@ export default function UnstoredItems() {
                                             style={{ height: 40, width: 150}}
                                         >
                                             <Picker.Item label="Select locations..." value="" />
-                                            <Picker.Item label="ROOM1" value="ROOM1" />
-                                            <Picker.Item label="ROOM2" value="ROOM2" />
-                                            <Picker.Item label="ROOM3" value="ROOM3" />
+                                            <Picker.Item label="SHELF1" value="SHELF1" />
+                                            <Picker.Item label="SHELF2" value="SHELF2" />
+                                            <Picker.Item label="SHELF3" value="SHELF3" />
                                         </Picker>
                                     </View>
                                     <View style={styles.buttonView}>

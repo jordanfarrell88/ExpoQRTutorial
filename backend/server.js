@@ -184,6 +184,7 @@ app.get("/storage/unstored", async (req, res) => {
   }
 })
 
+// UPDATE location of delivery items that are not stored yet
 app.put('/delivery_items/:item_id/storage', async (req, res) => {
   const { item_id } = req.params
   const { room_number, storage_location } = req.body
@@ -208,6 +209,59 @@ app.put('/delivery_items/:item_id/storage', async (req, res) => {
   res.status(500).json({ error: "Failed to update item location"})
 })
 
+// GET unique list of rooms and storage locations for combobox
+app.get("/storage/rooms", async (req, res) => {
+
+  try {
+    const roomsResult = await pool.query(`
+      SELECT * FROM storage_rooms
+      `)
+
+      
+
+        console.log("Found items", roomsResult.rows.length, shelfResult.rows.length)
+
+        if(roomsResult.rows.length === 0) {
+          return res.json([])
+        }
+
+        const rooms = roomsResult.rows
+        res.json(rooms)
+  } catch (error) {
+    console.error("Detailed error:", error.message)
+    console.error("Error stack", error.stack)
+
+    res.status(500).json({ error: "Could not load storage locations"})
+  }
+})
+
+// GET unique list of storage locations from Room selection
+
+app.get("/storage/rooms/:room_id", async (req, res) => {
+
+  try {
+
+    const {room_id} = req.params
+
+    const locationResult = await pool.query(`
+      SELECT * FROM storage_locations 
+      WHERE room_id = $1
+        `, [room_id])
+
+      console.log("Records found: ", locationResult.rows.length)
+      
+      const locations = locationResult.rows
+
+      res.json(locations)
+
+  } catch (error) {
+    console.error("No locations found in room", error.message)
+    console.error("Error stack", error.stack)
+
+    res.status(500).json({ error: "Could not find storage locations in set room."})
+  }
+})
+
 app.listen(port, () => {
     console.log('Server is running on http://localhost:', port)
-})
+})  
