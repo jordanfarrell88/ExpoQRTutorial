@@ -4,6 +4,7 @@ import { router } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useEffect, useState } from 'react'
 import { Picker } from "@react-native-picker/picker"
+import { LinearGradient } from "expo-linear-gradient"
 
 
 
@@ -123,82 +124,97 @@ export default function UnstoredItems() {
                     <Ionicons name="refresh" size={24} onPress={onRefresh} />
                 </TouchableOpacity>
             </View>
+            <View style={{ flex: 1, position: 'relative', marginTop: 0}}>
+                <LinearGradient 
+                    colors= {['rgba(248, 250, 252, 1)', 'transparent']}
+                    style={styles.topFade}
+                    start= {{ x: 0, y: 0}}
+                    end={{ x: 0, y: 1}}
+                />
 
-            <ScrollView
-                style={styles.scrollView}
-                showsVerticalScrollIndicator={false}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
-            >
+                <ScrollView
+                    style={styles.scrollView}
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+                >
 
-                {unstored.length === 0 ? (
-                    <View style={styles.emptyContainer}>
-                        <Ionicons name="cube-outline" size={24} color="#9ca3af" />
-                        <Text style={styles.emptyTitle}>No Unstored Items Found</Text>
-                        <Text style={styles.emptySubtitle}>Unstored delivery items will be appear here</Text>
-                    </View>
-                ) : (
-                    unstored.map((item) => (
-
-                        <View key={item.id} style={styles.itemCard}>
-                            <TouchableOpacity style={styles.itemHeader} onPress={() => toggleExpanded(item.id)}>
-                                <View style={styles.itemMainInfo} >
-                                    <View style={styles.itemTitleRow}>
-                                        <Text style={styles.itemId}>#{item.id}</Text>
-                                    </View>
-                                    <Text style={styles.supplierName}>{item.line_code}</Text>
-                                    <Text style={styles.supplierName}>{item.product_description}</Text>
-                                    <Text style={styles.deliveryDate}>Delivery: #{item.deliv_id}</Text>
-                                    
-                                </View>
-                                <View style={styles.itemStats}>
-                                    <Text style={styles.itemTotal}>R{item.total_price}</Text>
-                                    <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
-
-                                    <Ionicons name={expandedDelivery === item.id ? "chevron-up" : "chevron-down"} 
-                                        size={20}
-                                        color={"#6b7280"}
-                                    />
-                                </View>
-                            </TouchableOpacity>
-
-                            {expandedDelivery === item.id && (
-                                <View style={styles.expandedView}>
-                                    <View style={styles.comboView}> 
-                                        <Text style={styles.locationText}>Room:</Text>
-                                        <Picker 
-                                            selectedValue={selectedRoom}
-                                            onValueChange={(itemValue) => setSelectedRoom(itemValue)}
-                                            style={{ height: 40, width: 150, borderWidth: 5, borderBlockColor: "#000000ff"}}
-                                        >
-                                            <Picker.Item label="Select room..." value="" />
-                                            <Picker.Item label="ROOM1" value="ROOM1" />
-                                            <Picker.Item label="ROOM2" value="ROOM2" />
-                                            <Picker.Item label="ROOM3" value="ROOM3" />
-                                        </Picker>
-                                        <Text style={styles.locationText}>Location:</Text>
-                                        <Picker
-                                            selectedValue={selectedLocation}
-                                            onValueChange={(loc) => setSelectedLocation(loc)}
-                                            style={{ height: 40, width: 150}}
-                                        >
-                                            <Picker.Item label="Select locations..." value="" />
-                                            <Picker.Item label="SHELF1" value="SHELF1" />
-                                            <Picker.Item label="SHELF2" value="SHELF2" />
-                                            <Picker.Item label="SHELF3" value="SHELF3" />
-                                        </Picker>
-                                    </View>
-                                    <View style={styles.buttonView}>
-                                        <TouchableOpacity style={styles.setLocationButton} onPress={() => setLocation(item.id, selectedRoom, selectedLocation)} >
-                                            <Text style={{ color: "#FFFFFF"}}>Set Item Location</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                            )}
+                    {unstored.length === 0 ? (
+                        <View style={styles.emptyContainer}>
+                            <Ionicons name="cube-outline" size={24} color="#9ca3af" />
+                            <Text style={styles.emptyTitle}>No Unstored Items Found</Text>
+                            <Text style={styles.emptySubtitle}>Unstored delivery items will be appear here</Text>
                         </View>
-                    ))
-                )}
-                
-            </ScrollView>
+                    ) : (
+                        unstored.map((item) => (
+
+                            <View key={item.id} style={styles.itemCard}>
+                                <TouchableOpacity style={styles.itemHeader} onPress={() => toggleExpanded(item.id)}>
+                                    <View style={styles.itemMainInfo} >
+                                        <View style={styles.itemTitleRow}>
+                                            <Text style={styles.itemId}>#{item.id}</Text>
+                                        </View>
+                                        <Text style={styles.supplierName}>{item.line_code}</Text>
+                                        <Text style={styles.supplierName}>{item.product_description}</Text>
+                                        <Text style={styles.deliveryDate}>Delivery: #{item.deliv_id}</Text>
+                                        
+                                    </View>
+                                    <View style={styles.itemStats}>
+                                        <Text style={styles.itemTotal}>R{item.total_price}</Text>
+                                        <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
+
+                                        <Ionicons name={expandedDelivery === item.id ? "chevron-up" : "chevron-down"} 
+                                            size={20}
+                                            color={"#6b7280"}
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+
+                                {expandedDelivery === item.id && (
+                                    <View style={styles.expandedView}>
+                                        <View style={styles.comboView}> 
+                                            <Text style={styles.locationText}>Room:</Text>
+                                            <Picker 
+                                                selectedValue={selectedRoom}
+                                                onValueChange={(itemValue) => setSelectedRoom(itemValue)}
+                                                style={{ height: 40, width: 150, borderWidth: 5, borderBlockColor: "#000000ff"}}
+                                            >
+                                                <Picker.Item label="Select room..." value="" />
+                                                <Picker.Item label="ROOM1" value="ROOM1" />
+                                                <Picker.Item label="ROOM2" value="ROOM2" />
+                                                <Picker.Item label="ROOM3" value="ROOM3" />
+                                            </Picker>
+                                            <Text style={styles.locationText}>Location:</Text>
+                                            <Picker
+                                                selectedValue={selectedLocation}
+                                                onValueChange={(loc) => setSelectedLocation(loc)}
+                                                style={{ height: 40, width: 150}}
+                                            >
+                                                <Picker.Item label="Select locations..." value="" />
+                                                <Picker.Item label="SHELF1" value="SHELF1" />
+                                                <Picker.Item label="SHELF2" value="SHELF2" />
+                                                <Picker.Item label="SHELF3" value="SHELF3" />
+                                            </Picker>
+                                        </View>
+                                        <View style={styles.buttonView}>
+                                            <TouchableOpacity style={styles.setLocationButton} onPress={() => setLocation(item.id, selectedRoom, selectedLocation)} >
+                                                <Text style={{ color: "#FFFFFF"}}>Set Item Location</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                )}
+                            </View>
+                        ))
+                    )}
+                    
+                </ScrollView>
+
+                <LinearGradient 
+                    colors={['transparent', 'rgba(248, 250, 252, 1)']}
+                    style={styles.bottomFade}
+                    start= {{ x: 0, y: 0}}
+                    end = {{ x: 0, y: 1}}
+                />
+            </View>
         </SafeAreaView>
         
     )
@@ -209,8 +225,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8fafc",
   },
+  topFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 30,
+    zIndex: 10
+  },
+  bottomFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 60
+  },
     scrollView: {
-        flex: 1
+        flex: 1,
+        paddingTop: 20
     },
     header: {
         flexDirection: 'row',
@@ -218,7 +250,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingVertical: 16,
-        marginBottom: 20,
+        marginBottom: 0,
         backgroundColor: "#ffffff",
         borderBottomWidth: 1,
         borderBottomColor: "#e5e7eb"

@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator
 import { SafeAreaView } from "react-native-safe-area-context"
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
+import { LinearGradient } from 'expo-linear-gradient'
 
 interface DeliveryItem {
   line_code: string
@@ -184,112 +185,129 @@ export default function RecentDeliveries() {
           <Ionicons name="refresh" size={20} color="#2563eb" />
         </TouchableOpacity>
       </View>
+      <View style={{ flex: 1, position: 'relative', marginTop: 10 }} >
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-      >
-        {/* Summary Stats 
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Delivery Summary</Text>
-          <View style={styles.summaryStats}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{deliveries.length}</Text>
-              <Text style={styles.statLabel}>Total Deliveries</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{deliveries.reduce((sum, delivery) => sum + delivery.quantity, 0)}</Text>
-              <Text style={styles.statLabel}>Items Delivered</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>
-                R{deliveries.reduce((sum, delivery) => sum + delivery.total, 0).toFixed(2)}
-              </Text>
-              <Text style={styles.statLabel}>Total Value</Text>
+        <LinearGradient 
+          colors= {['rgba(248, 250, 252, 1)', 'transparent',]}
+          style={styles.topFade}
+          start= {{ x: 0, y: 0}}
+          end= {{ x: 0, y: 1}}
+        />
+
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
+          {/* Summary Stats 
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryTitle}>Delivery Summary</Text>
+            <View style={styles.summaryStats}>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>{deliveries.length}</Text>
+                <Text style={styles.statLabel}>Total Deliveries</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>{deliveries.reduce((sum, delivery) => sum + delivery.quantity, 0)}</Text>
+                <Text style={styles.statLabel}>Items Delivered</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>
+                  R{deliveries.reduce((sum, delivery) => sum + delivery.total, 0).toFixed(2)}
+                </Text>
+                <Text style={styles.statLabel}>Total Value</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        */}
+          */}
 
-        {/* Deliveries List */}
-        {deliveries.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Ionicons name="cube-outline" size={64} color="#9ca3af" />
-            <Text style={styles.emptyTitle}>No Deliveries Found</Text>
-            <Text style={styles.emptySubtitle}>Your recent deliveries will appear here</Text>
-          </View>
-        ) : (
-          deliveries.map((delivery) => (
-            <View key={delivery.deliv_id} style={styles.deliveryCard}>
-              <TouchableOpacity style={styles.deliveryHeader} onPress={() => toggleExpanded(delivery.deliv_id)}>
-                <View style={styles.deliveryMainInfo}>
-                  <View style={styles.deliveryTitleRow}>
-                    <Text style={styles.deliveryId}>#{delivery.deliv_id}</Text>
+          {/* Deliveries List */}
+          {deliveries.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="cube-outline" size={64} color="#9ca3af" />
+              <Text style={styles.emptyTitle}>No Deliveries Found</Text>
+              <Text style={styles.emptySubtitle}>Your recent deliveries will appear here</Text>
+            </View>
+          ) : (
+            deliveries.map((delivery) => (
+              <View key={delivery.deliv_id} style={styles.deliveryCard}>
+                <TouchableOpacity style={styles.deliveryHeader} onPress={() => toggleExpanded(delivery.deliv_id)}>
+                  <View style={styles.deliveryMainInfo}>
+                    <View style={styles.deliveryTitleRow}>
+                      <Text style={styles.deliveryId}>#{delivery.deliv_id}</Text>
+                      
+                    </View>
+                    <Text style={styles.supplierName}>{delivery.supplier}</Text>
+                    <Text style={styles.deliveryDate}>{formatDate(delivery.delivered_at)}</Text>
+                  </View>
+                  <View style={styles.deliveryStats}>
+                    <Text style={styles.deliveryTotal}>R{delivery.total}</Text>
+                    <Text style={styles.deliveryQuantity}>{delivery.quantity} items</Text>
                     
+                    <Ionicons
+                      name={expandedDelivery === delivery.deliv_id ? "chevron-up" : "chevron-down"}
+                      size={20}
+                      color="#6b7280"
+                    />
                   </View>
-                  <Text style={styles.supplierName}>{delivery.supplier}</Text>
-                  <Text style={styles.deliveryDate}>{formatDate(delivery.delivered_at)}</Text>
-                </View>
-                <View style={styles.deliveryStats}>
-                  <Text style={styles.deliveryTotal}>R{delivery.total}</Text>
-                  <Text style={styles.deliveryQuantity}>{delivery.quantity} items</Text>
-                  
-                  <Ionicons
-                    name={expandedDelivery === delivery.deliv_id ? "chevron-up" : "chevron-down"}
-                    size={20}
-                    color="#6b7280"
-                  />
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
 
-              {expandedDelivery === delivery.deliv_id && (
-                <View style={styles.deliveryDetails}>
-                  <View style={styles.detailsHeader}>
-                    <Text style={styles.detailsTitle}>Delivery Items</Text>
-                    <TouchableOpacity style={{ paddingLeft: 220}} onPress={() => handlePrint(delivery)} >
-                      <Ionicons style={styles.deleteIcon} name="document-outline" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(delivery.deliv_id)}>
-                        <Ionicons style={styles.deleteIcon} name="trash" />
-                    </TouchableOpacity>
-                  </View>
+                {expandedDelivery === delivery.deliv_id && (
+                  <View style={styles.deliveryDetails}>
+                    <View style={styles.detailsHeader}>
+                      <Text style={styles.detailsTitle}>Delivery Items</Text>
+                      <TouchableOpacity style={{ paddingLeft: 220}} onPress={() => handlePrint(delivery)} >
+                        <Ionicons style={styles.deleteIcon} name="document-outline" />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(delivery.deliv_id)}>
+                          <Ionicons style={styles.deleteIcon} name="trash" />
+                      </TouchableOpacity>
+                    </View>
 
-                  {delivery.items.map((item, index) => (
-                    <View key={`${item.line_code}-${index}`} style={styles.itemRow}>
-                      <View style={styles.itemInfo}>
-                        <Text style={styles.itemCode}>{item.line_code}</Text>
-                        <Text style={styles.itemDescription}>{item.product_description}</Text>
+                    {delivery.items.map((item, index) => (
+                      <View key={`${item.line_code}-${index}`} style={styles.itemRow}>
+                        <View style={styles.itemInfo}>
+                          <Text style={styles.itemCode}>{item.line_code}</Text>
+                          <Text style={styles.itemDescription}>{item.product_description}</Text>
+                        </View>
+                        <View style={styles.itemStats}>
+                          <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
+                          <Text style={styles.itemPrice}>R{(item.unit_price * item.quantity)}</Text>
+                        </View>
                       </View>
-                      <View style={styles.itemStats}>
-                        <Text style={styles.itemQuantity}>Qty: {item.quantity}</Text>
-                        <Text style={styles.itemPrice}>R{(item.unit_price * item.quantity)}</Text>
+                    ))}
+
+                    <View style={styles.deliveryTotals}>
+                      <View style={styles.totalRow}>
+                        <Text style={styles.totalLabel}>Subtotal:</Text>
+                        <Text style={styles.totalValue}>R{delivery.subtotal}</Text>
+                      </View>
+                      <View style={styles.totalRow}>
+                        <Text style={styles.totalLabel}>VAT (15%):</Text>
+                        <Text style={styles.totalValue}>R{delivery.vat_amount}</Text>
+                      </View>
+                      <View style={[styles.totalRow, styles.finalTotal]}>
+                        <Text style={styles.finalTotalLabel}>Total:</Text>
+                        <Text style={styles.finalTotalValue}>R{delivery.total}</Text>
                       </View>
                     </View>
-                  ))}
-
-                  <View style={styles.deliveryTotals}>
-                    <View style={styles.totalRow}>
-                      <Text style={styles.totalLabel}>Subtotal:</Text>
-                      <Text style={styles.totalValue}>R{delivery.subtotal}</Text>
-                    </View>
-                    <View style={styles.totalRow}>
-                      <Text style={styles.totalLabel}>VAT (15%):</Text>
-                      <Text style={styles.totalValue}>R{delivery.vat_amount}</Text>
-                    </View>
-                    <View style={[styles.totalRow, styles.finalTotal]}>
-                      <Text style={styles.finalTotalLabel}>Total:</Text>
-                      <Text style={styles.finalTotalValue}>R{delivery.total}</Text>
-                    </View>
                   </View>
-                </View>
-              )}
-            </View>
-          ))
-        )}
-        <View style={styles.bottomPadding} />
-      </ScrollView>
+                )}
+              </View>
+            ))
+          )}
+          <View style={styles.bottomPadding} />
+        </ScrollView>
+
+        <LinearGradient 
+          colors={['transparent', 'rgba(248, 250, 252, 1)']}
+          style={styles.bottomFade}
+          start= {{ x: 0, y: 0}}
+          end={{ x: 0, y: 1}}
+        />
+      </View>
         <View style={styles.buttonView}>
         <TouchableOpacity style={styles.newOrderButton} onPress={() => router.push("/scanner")}>
             <Text style={styles.orderButtonText}>Scan new delivery</Text>
@@ -301,12 +319,28 @@ export default function RecentDeliveries() {
 }
 
 const styles = StyleSheet.create({
+  bottomFade: {
+    position: 'absolute', 
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 60
+  },
+  topFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: -10,
+    height: 30,
+    zIndex: 10
+  },
   container: {
     flex: 1,
     backgroundColor: "#f8fafc",
   },
   scrollView: {
     flex: 1,
+    paddingTop: 10
   },
   header: {
     flexDirection: "row",
@@ -314,7 +348,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
-    marginBottom: 20,
+    marginBottom: 0,
     backgroundColor: "#ffffff",
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
@@ -557,16 +591,18 @@ const styles = StyleSheet.create({
   newOrderButton: {
     backgroundColor: "#2563eb",
     height: 70,
+    width: 200,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center"
   },
   buttonView: {
     marginBottom: 20,
-    marginHorizontal: 50,
+    marginHorizontal: 33,
     height: 100,
     width: 300,
     justifyContent: "center",
+    alignItems: 'center'
   },
   orderButtonText: {
     color: "#ffffff",

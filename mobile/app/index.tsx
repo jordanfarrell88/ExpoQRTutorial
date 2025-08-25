@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logo: {
-    marginTop: 70,
+    marginTop: 40,
     marginBottom: 16,
     borderRadius: 12,
   },
@@ -211,14 +211,14 @@ const styles = StyleSheet.create({
     color: "#374151",
   },
   actionsContainer: {
-    marginBottom: 32,
+    marginBottom: 5,
   },
   primaryAction: {
     backgroundColor: "#2563eb",
     borderRadius: 16,
     padding: 24,
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f7efefff",
     borderRadius: 12,
     padding: 16,
-    width: 370,
+    width: 340,
     marginBottom: 12,
     shadowColor: "#000",
     shadowOffset: {
